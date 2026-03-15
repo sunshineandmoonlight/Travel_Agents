@@ -283,14 +283,21 @@ async def get_destinations_stream(request: TravelRequirementForm):
             result = recommend_destinations(requirements, llm=llm)
 
             # 发送用户画像结果
-            yield f"data: {json.dumps({\"type\": \"step_result\", \"step\": \"用户需求分析完成\", \"agent\": \"UserRequirementAnalyst\", \"data\": {
-                \"description\": result['user_portrait'].get('description', ''),
-                \"travel_type\": result['user_portrait'].get('travel_type', ''),
-                \"pace_preference\": result['user_portrait'].get('pace_preference', ''),
-                \"budget_level\": result['user_portrait'].get('budget_level', ''),
-                \"interests\": requirements.get('interests', []),
-                \"llm_description\": result['user_portrait'].get('llm_description', '')
-            }, \"progress\": 50}, ensure_ascii=False)}\n\n"
+            portrait_data = {
+                'type': 'step_result',
+                'step': '用户需求分析完成',
+                'agent': 'UserRequirementAnalyst',
+                'data': {
+                    'description': result['user_portrait'].get('description', ''),
+                    'travel_type': result['user_portrait'].get('travel_type', ''),
+                    'pace_preference': result['user_portrait'].get('pace_preference', ''),
+                    'budget_level': result['user_portrait'].get('budget_level', ''),
+                    'interests': requirements.get('interests', []),
+                    'llm_description': result['user_portrait'].get('llm_description', '')
+                },
+                'progress': 50
+            }
+            yield f"data: {json.dumps(portrait_data, ensure_ascii=False)}\n\n"
 
             # 步骤3: 排序推荐
             yield f"data: {json.dumps({'type': 'progress', 'step': '正在综合评分和排序...', 'agent': 'RankingScorer', 'progress': 70}, ensure_ascii=False)}\n\n"
