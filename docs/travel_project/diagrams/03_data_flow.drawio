@@ -1,0 +1,258 @@
+<mxfile host="app.diagrams.net" modified="2025-01-16T00:00:00.000Z" agent="5.0" version="24.0.0">
+  <diagram name="数据流设计" id="data-flow">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- 标题 -->
+        <mxCell id="title" value="数据流设计图" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="500" y="20" width="300" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- 用户输入 -->
+        <mxCell id="user-input" value="👤 用户输入" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user-form" value="• 出行天数&#xa;• 出行人数&#xa;• 预算范围&#xa;• 兴趣偏好&#xa;• 特殊需求" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="80" y="160" width="140" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- A1: 需求分析 -->
+        <mxCell id="a1-req" value="A1: 需求分析" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="80" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a1-output" value="用户画像&#xa;&#xa;• 旅行类型&#xa;• 节奏偏好&#xa;• 预算等级&#xa;• 兴趣标签" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="320" y="160" width="140" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- A2: 目的地匹配 -->
+        <mxCell id="a2-dest" value="A2: 目的地匹配" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="80" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a2-output" value="候选目的地&#xa;&#xa;• 目的地列表&#xa;• 匹配分数&#xa;• 优先推荐标记&#xa;• [PREFERRED] 标记" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="560" y="160" width="140" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- 分支: 左边到 C1, 右边到 B1 -->
+        <mxCell id="branch-label" value="并行处理" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="630" y="300" width="80" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- C1: 目的地情报 -->
+        <mxCell id="c1-intel" value="C1: 目的地情报" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="340" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="c1-api" value="外部API调用&#xa;&#xa;• 实时天气&#xa;• 当地新闻&#xa;• 旅游资讯" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="320" y="420" width="140" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- B1: 景点推荐 -->
+        <mxCell id="b1-attr" value="B1: 景点推荐" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="340" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="b1-api" value="TianAPI 调用&#xa;&#xa;• 景点列表&#xa;• 景点详情&#xa;• 门票价格" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="560" y="420" width="140" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- C2: 预算分析 -->
+        <mxCell id="c2-budget" value="C2: 预算分析" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="560" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="c2-output" value="预算分析结果&#xa;&#xa;• 交通费用&#xa;• 住宿费用&#xa;• 餐饮费用&#xa;• 门票费用" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="320" y="640" width="140" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- A3: 行程规划 -->
+        <mxCell id="a3-plan" value="A3: 行程规划" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="560" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a3-output" value="行程安排&#xa;&#xa;• 每日行程&#xa;• 景点顺序&#xa;• 时间分配" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="560" y="640" width="140" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- C3: 攻略生成 -->
+        <mxCell id="c3-guide" value="C3: 攻略生成" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="560" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="c3-llm" value="LLM + TianAPI&#xa;&#xa;• 生成攻略文本&#xa;• 集成真实景点&#xa;• 流式输出" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="800" y="640" width="140" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- 输出 -->
+        <mxCell id="final-output" value="📄 完整攻略" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="780" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="output-formats" value="导出格式&#xa;&#xa;• PDF&#xa;• Word&#xa;• Markdown" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="980" y="770" width="120" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- 连接线 -->
+        <mxCell id="link1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#b85450;" edge="1" parent="1" source="user-input" target="a1-req">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="link2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#b85450;" edge="1" parent="1" source="a1-output" target="a2-dest">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="280" />
+              <mxPoint x="630" y="280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6c8ebf;" edge="1" parent="1" source="a2-output" target="c1-intel">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="480" y="290" />
+              <mxPoint x="480" y="370" />
+              <mxPoint x="390" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="a2-output" target="b1-attr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="link5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6c8ebf;" edge="1" parent="1" source="c1-api" target="c2-budget">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="540" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="b1-api" target="a3-plan">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="540" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#b85450;" edge="1" parent="1" source="a2-output" target="a3-plan">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="780" y="290" />
+              <mxPoint x="780" y="590" />
+              <mxPoint x="700" y="590" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6c8ebf;" edge="1" parent="1" source="c2-output" target="c3-guide">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="760" />
+              <mxPoint x="870" y="760" />
+              <mxPoint x="870" y="730" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#b85450;" edge="1" parent="1" source="a3-output" target="c3-guide">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="link10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#82b366;" edge="1" parent="1" source="c3-llm" target="final-output">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="870" y="760" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#d6b656;dashed=1;" edge="1" parent="1" source="final-output" target="output-formats">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 数据存储 -->
+        <mxCell id="storage-box" value="数据存储" style="swimlane;fontSize=12;fontStyle=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="80" y="560" width="180" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mongodb" value="MongoDB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e3e3e3;strokeColor=#666666;fontSize=10;" vertex="1" parent="storage-box">
+          <mxGeometry x="50" y="40" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="redis" value="Redis" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e3e3e3;strokeColor=#666666;fontSize=10;" vertex="1" parent="storage-box">
+          <mxGeometry x="50" y="120" width="80" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cache-label" value="缓存" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;" vertex="1" parent="storage-box">
+          <mxGeometry x="90" y="80" width="40" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- 从存储到各个Agent的虚线 -->
+        <mxCell id="link12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#999999;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mongodb" target="a1-req">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="150" y="110" />
+              <mxPoint x="270" y="110" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#999999;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="redis" target="c1-intel">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="150" y="615" />
+              <mxPoint x="270" y="615" />
+              <mxPoint x="270" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 外部API -->
+        <mxCell id="external-api-box" value="外部API" style="swimlane;fontSize=12;fontStyle=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="800" y="80" width="300" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tianapi" value="天行数据&#xa;(TianAPI)&#xa;&#xa;国内景点库" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="external-api-box">
+          <mxGeometry x="20" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="opentripmap" value="OpenTripMap&#xa;&#xa;国际景点库" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="external-api-box">
+          <mxGeometry x="160" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="unsplash" value="Unsplash&#xa;&#xa;图片库" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="external-api-box">
+          <mxGeometry x="20" y="120" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="weather-api" value="天气API&#xa;(可选)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="external-api-box">
+          <mxGeometry x="160" y="120" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- 从外部API到智能体的虚线 -->
+        <mxCell id="link14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#d6b656;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="tianapi" target="b1-api">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="740" y="465" />
+              <mxPoint x="740" y="465" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#d6b656;dashed=1;" edge="1" parent="1" source="unsplash" target="c3-guide">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="740" y="590" />
+              <mxPoint x="740" y="590" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

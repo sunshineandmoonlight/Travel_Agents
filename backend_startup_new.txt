@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "D:\projet\agent_project\Web_Agent_System\TradingAgents-CN\app\travel_main.py", line 32, in <module>
+    from app.core.config import settings
+ModuleNotFoundError: No module named 'app'

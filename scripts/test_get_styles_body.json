@@ -1,0 +1,11 @@
+{
+  "destination": "北京",
+  "user_requirements": {
+    "travel_scope": "domestic",
+    "days": 5,
+    "user_portrait": {
+      "travel_type": "情侣游",
+      "description": "测试"
+    }
+  }
+}

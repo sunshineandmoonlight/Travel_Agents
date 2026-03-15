@@ -1,0 +1,154 @@
+<mxfile host="app.diagrams.net" modified="2025-01-16T00:00:00.000Z" agent="5.0" version="24.0.0">
+  <diagram name="系统架构" id="system-architecture">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- 标题 -->
+        <mxCell id="title" value="智能旅行规划系统 - 系统架构图" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="400" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- 前端层 -->
+        <mxCell id="frontend-layer" value="前端层 (Vue 3)" style="swimlane;fontSize=16;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="1000" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="requirement-collect" value="需求收集" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="frontend-layer">
+          <mxGeometry x="40" y="50" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="destination-show" value="目的地展示" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="frontend-layer">
+          <mxGeometry x="200" y="50" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="guide-generate" value="攻略生成" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="frontend-layer">
+          <mxGeometry x="360" y="50" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="guide-center" value="攻略中心" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="frontend-layer">
+          <mxGeometry x="520" y="50" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- API层 -->
+        <mxCell id="api-layer" value="API层 (FastAPI)" style="swimlane;fontSize=16;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="80" y="220" width="1000" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="travel-api" value="旅行规划API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="api-layer">
+          <mxGeometry x="40" y="50" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="async-api" value="异步任务API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="api-layer">
+          <mxGeometry x="200" y="50" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="cache-api" value="缓存API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="api-layer">
+          <mxGeometry x="360" y="50" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="export-api" value="导出API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="api-layer">
+          <mxGeometry x="520" y="50" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- 业务逻辑层 -->
+        <mxCell id="business-layer" value="业务逻辑层 (Python)" style="swimlane;fontSize=16;fontStyle=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="80" y="360" width="1000" height="320" as="geometry" />
+        </mxCell>
+
+        <!-- Group A -->
+        <mxCell id="group-a-box" value="Group A - 分析层智能体" style="swimlane;fontSize=12;fontStyle=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="business-layer">
+          <mxGeometry x="40" y="40" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="agent-a1" value="需求分析Agent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="group-a-box">
+          <mxGeometry x="20" y="40" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="agent-a2" value="目的地匹配Agent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="group-a-box">
+          <mxGeometry x="150" y="40" width="100" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Group B -->
+        <mxCell id="group-b-box" value="Group B - 设计层智能体" style="swimlane;fontSize=12;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="business-layer">
+          <mxGeometry x="360" y="40" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="agent-b1" value="景点推荐" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="group-b-box">
+          <mxGeometry x="10" y="40" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="agent-b2" value="酒店推荐" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="group-b-box">
+          <mxGeometry x="80" y="40" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="agent-b3" value="餐厅推荐" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="group-b-box">
+          <mxGeometry x="150" y="40" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="agent-b4" value="交通规划" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="group-b-box">
+          <mxGeometry x="220" y="40" width="60" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Group C -->
+        <mxCell id="group-c-box" value="Group C - 生成层智能体" style="swimlane;fontSize=12;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="business-layer">
+          <mxGeometry x="680" y="40" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="agent-c1" value="目的地情报" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="group-c-box">
+          <mxGeometry x="10" y="40" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="agent-c2" value="预算分析" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="group-c-box">
+          <mxGeometry x="100" y="40" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="agent-c3" value="LLM攻略生成" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="group-c-box">
+          <mxGeometry x="190" y="40" width="80" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- LangGraph协调层 -->
+        <mxCell id="langgraph-coord" value="LangGraph 多智能体协调层" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="business-layer">
+          <mxGeometry x="40" y="180" width="920" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- 连接线: 前端到API -->
+        <mxCell id="link1" value="HTTP/SSE" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="1" source="requirement-collect" target="travel-api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="destination-show" target="cache-api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="guide-generate" target="async-api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="guide-center" target="export-api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 连接线: API到业务层 -->
+        <mxCell id="link5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="travel-api" target="agent-a1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="async-api" target="agent-c3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 数据层 -->
+        <mxCell id="data-layer" value="数据层" style="swimlane;fontSize=16;fontStyle=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="80" y="700" width="1000" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="mongodb" value="MongoDB\n(数据存储)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e3e3e3;strokeColor=#666666;fontSize=10;" vertex="1" parent="data-layer">
+          <mxGeometry x="60" y="40" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="Redis\n(缓存/队列)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e3e3e3;strokeColor=#666666;fontSize=10;" vertex="1" parent="data-layer">
+          <mxGeometry x="220" y="40" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tianapi" value="天行数据\n(景点库)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="data-layer">
+          <mxGeometry x="380" y="40" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="unsplash" value="Unsplash\n(图片)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="data-layer">
+          <mxGeometry x="540" y="40" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="opentripmap" value="OpenTripMap\n(国际景点)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="data-layer">
+          <mxGeometry x="700" y="40" width="100" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- 连接线: 业务层到数据层 -->
+        <mxCell id="link7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="langgraph-coord" target="mongodb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="langgraph-coord" target="redis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="agent-b1" target="tianapi">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

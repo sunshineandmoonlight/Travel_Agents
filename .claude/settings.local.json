@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(python:*)",
+      "Bash(mongosh:*)",
+      "Bash(powershell:*)",
+      "Bash(\"D:/projet/agent_project/Web_Agent_System/TradingAgents-CN/travelagents/utils/destination_classifier.py\":*)",
+      "Bash(\"D:/projet/agent_project/Web_Agent_System/TradingAgents-CN/travelagents/utils/states.py\":*)",
+      "Bash(\"D:/projet/agent_project/Web_Agent_System/TradingAgents-CN/travelagents/tests/test_classifier.py\":*)",
+      "Bash(sed:*)",
+      "WebSearch",
+      "Bash(docker-compose:*)",
+      "Bash(where mongod:*)",
+      "Bash(yarn dev:*)",
+      "Bash(npm run:*)",
+      "Bash(set:*)",
+      "Bash(netstat:*)",
+      "Bash(timeout:*)",
+      "Bash(curl:*)",
+      "Bash(tasklist:*)",
+      "Bash(touch:*)",
+      "Bash(rm:*)",
+      "Bash(pkill:*)",
+      "Bash(node:*)"
+    ]
+  }
+}

@@ -1,0 +1,192 @@
+<mxfile host="app.diagrams.net" modified="2025-01-16T00:00:00.000Z" agent="5.0" version="24.0.0">
+  <diagram name="智能体协作流程" id="agent-flow">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- 标题 -->
+        <mxCell id="title" value="智能体协作流程图" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="600" y="20" width="300" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- 用户输入 -->
+        <mxCell id="user-input" value="👤 用户输入" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="80" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Group A: 分析层 -->
+        <mxCell id="group-a-container" value="Group A - 分析层" style="swimlane;fontSize=14;fontStyle=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="200" y="180" width="1000" height="150" as="geometry" />
+        </mxCell>
+
+        <mxCell id="agent-a1" value="A1: 需求分析Agent&#xa;UserRequirementAnalyst&#xa;&#xa;功能: 创建用户画像&#xa;输出: travel_type, interests, budget" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;align=left;" vertex="1" parent="group-a-container">
+          <mxGeometry x="50" y="40" width="200" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="agent-a2" value="A2: 目的地匹配Agent&#xa;DestinationMatcher&#xa;&#xa;功能: 匹配推荐目的地&#xa;输出: 目的地列表(带分数)&#xa;特色: 特殊需求优先推荐" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;align=left;" vertex="1" parent="group-a-container">
+          <mxGeometry x="300" y="40" width="200" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="llm-call-a" value="LLM评分" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="group-a-container">
+          <mxGeometry x="550" y="60" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rule-engine-a" value="规则引擎" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="group-a-container">
+          <mxGeometry x="700" y="60" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Group B: 设计层 -->
+        <mxCell id="group-b-container" value="Group B - 设计层" style="swimlane;fontSize=14;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="200" y="380" width="1000" height="150" as="geometry" />
+        </mxCell>
+
+        <mxCell id="agent-b1" value="B1: 景点推荐Agent&#xa;AttractionDesigner&#xa;&#xa;数据源: TianAPI, OpenTripMap" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=left;" vertex="1" parent="group-b-container">
+          <mxGeometry x="50" y="40" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="agent-b2" value="B2: 酒店推荐Agent&#xa;AccommodationDesigner" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=left;" vertex="1" parent="group-b-container">
+          <mxGeometry x="230" y="40" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="agent-b3" value="B3: 餐厅推荐Agent&#xa;RestaurantDesigner" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=left;" vertex="1" parent="group-b-container">
+          <mxGeometry x="410" y="40" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="agent-b4" value="B4: 交通规划Agent&#xa;TransportationDesigner" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;align=left;" vertex="1" parent="group-b-container">
+          <mxGeometry x="590" y="40" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Group C: 生成层 -->
+        <mxCell id="group-c-container" value="Group C - 生成层" style="swimlane;fontSize=14;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="200" y="580" width="1000" height="150" as="geometry" />
+        </mxCell>
+
+        <mxCell id="agent-c1" value="C1: 目的地情报Agent&#xa;DestinationIntelligenceAgent&#xa;&#xa;功能: 实时天气、新闻" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=left;" vertex="1" parent="group-c-container">
+          <mxGeometry x="50" y="40" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="agent-c2" value="C2: 预算分析Agent&#xa;BudgetAnalyst&#xa;&#xa;功能: 多维度成本估算" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=left;" vertex="1" parent="group-c-container">
+          <mxGeometry x="280" y="40" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="agent-c3" value="C3: LLM攻略生成Agent&#xa;LLMGuideWriter&#xa;&#xa;功能: 生成完整攻略&#xa;特色: TianAPI真实景点数据" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;align=left;" vertex="1" parent="group-c-container">
+          <mxGeometry x="510" y="40" width="200" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="stream-output" value="SSE流式输出" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="group-c-container">
+          <mxGeometry x="760" y="55" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- 输出 -->
+        <mxCell id="output" value="📄 旅行攻略&#xa;&#xa;• PDF格式&#xa;• Word格式&#xa;• Markdown格式" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=left;" vertex="1" parent="1">
+          <mxGeometry x="600" y="780" width="200" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- 连接线 -->
+        <mxCell id="link1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="user-input" target="agent-a1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="700" y="160" as="sourcePoint" />
+            <mxPoint x="300" y="220" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="700" y="150" />
+              <mxPoint x="300" y="150" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="agent-a1" target="agent-a2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="350" y="275" />
+              <mxPoint x="350" y="230" />
+              <mxPoint x="500" y="230" />
+              <mxPoint x="500" y="275" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#d6b656;dashed=1;" edge="1" parent="1" source="agent-a2" target="llm-call-a">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="link4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#d6b656;dashed=1;" edge="1" parent="1" source="agent-a2" target="rule-engine-a">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="link5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="agent-a2" target="agent-b1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="370" />
+              <mxPoint x="350" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;dashed=1;" edge="1" parent="1" source="agent-b1" target="agent-b2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="link7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;dashed=1;" edge="1" parent="1" source="agent-b2" target="agent-b3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="link8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;dashed=1;" edge="1" parent="1" source="agent-b3" target="agent-b4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="link9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6c8ebf;" edge="1" parent="1" source="agent-b4" target="agent-c1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="570" />
+              <mxPoint x="350" y="570" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="link10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;dashed=1;" edge="1" parent="1" source="agent-c1" target="agent-c2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="link11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6c8ebf;" edge="1" parent="1" source="agent-c2" target="agent-c3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="link12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6c8ebf;" edge="1" parent="1" source="agent-c3" target="stream-output">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="link13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#82b366;" edge="1" parent="1" source="stream-output" target="output">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1100" y="760" />
+              <mxPoint x="700" y="760" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 图例 -->
+        <mxCell id="legend-box" value="图例" style="swimlane;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="180" width="250" height="250" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-solid" value="实线: 主要数据流" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#82b366;fontSize=10;" vertex="1" parent="legend-box">
+          <mxGeometry x="20" y="40" width="210" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-dashed" value="虚线: 辅助数据流" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;fontSize=10;dashed=1;" vertex="1" parent="legend-box">
+          <mxGeometry x="20" y="80" width="210" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-group-a" value="Group A: 分析层" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="legend-box">
+          <mxGeometry x="20" y="120" width="210" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-group-b" value="Group B: 设计层" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="legend-box">
+          <mxGeometry x="20" y="160" width="210" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-group-c" value="Group C: 生成层" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="legend-box">
+          <mxGeometry x="20" y="200" width="210" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

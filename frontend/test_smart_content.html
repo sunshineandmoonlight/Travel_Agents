@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能内容测试</title>
+</head>
+<body>
+  <h1>智能旅行内容测试</h1>
+  <div id="results"></div>
+
+  <script type="module">
+    import { getAttractionDetails, getRestaurantRecommendation, getTransportInfo } from './src/utils/smartTravelContent.ts';
+
+    const results = document.getElementById('results');
+
+    // 测试罗马景点
+    const romeAttraction = getAttractionDetails('罗马', '罗马');
+    results.innerHTML += `<h2>罗马景点详情</h2>`;
+    results.innerHTML += `<p><strong>描述:</strong> ${romeAttraction?.description?.substring(0, 100)}...</p>`;
+    results.innerHTML += `<p><strong>亮点:</strong> ${romeAttraction?.highlights?.[0]}</p>`;
+    results.innerHTML += `<p><strong>门票:</strong> €${romeAttraction?.tickets?.price}</p>`;
+
+    // 测试罗马午餐
+    const romeLunch = getRestaurantRecommendation('罗马', 'lunch');
+    results.innerHTML += `<h2>罗马午餐推荐</h2>`;
+    results.innerHTML += `<p><strong>餐厅:</strong> ${romeLunch?.name}</p>`;
+    results.innerHTML += `<p><strong>地址:</strong> ${romeLunch?.address}</p>`;
+    results.innerHTML += `<p><strong>招牌菜:</strong> ${romeLunch?.signatureDishes?.[0]?.name} - €${romeLunch?.signatureDishes?.[0]?.price}</p>`;
+
+    // 测试罗马交通
+    const romeTransport = getTransportInfo('罗马');
+    results.innerHTML += `<h2>罗马交通信息</h2>`;
+    results.innerHTML += `<p><strong>方式:</strong> ${romeTransport?.method}</p>`;
+    results.innerHTML += `<p><strong>时长:</strong> ${romeTransport?.duration}</p>`;
+    results.innerHTML += `<p><strong>费用:</strong> €${romeTransport?.cost}</p>`;
+
+    console.log('测试完成！');
+    console.log('罗马景点:', romeAttraction);
+    console.log('罗马午餐:', romeLunch);
+    console.log('罗马交通:', romeTransport);
+  </script>
+</body>
+</html>
