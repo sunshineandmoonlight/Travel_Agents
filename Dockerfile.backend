@@ -1,8 +1,8 @@
-# Backend Dockerfile for FastAPI service (TradingAgents-CN v1.0.0-preview)
-# 前后端分离架构 - 后端服务
+# Backend Dockerfile for TravelAgents v3.0
+# 智能旅行规划系统 - 后端服务
 # 支持多架构: amd64, arm64
 
-# 使用 Debian Bookworm (稳定版) 而不是 Trixie (测试版)
+# 使用 Debian Bookworm (稳定版)
 FROM python:3.10-slim-bookworm
 
 # 获取构建架构信息
@@ -17,15 +17,13 @@ WORKDIR /app
 
 # 创建必需的目录并安装系统依赖
 # - curl: 健康检查
-# - pandoc: 从 GitHub 下载最新版本（避免 Debian 仓库问题）
-# - wkhtmltopdf: 从官方下载（用于 PDF 生成）
+# - pandoc: Markdown 转换
+# - wkhtmltopdf: PDF 生成
 # - 中文字体: 用于 PDF 中文显示
 RUN mkdir -p /app/logs /app/data /app/config && \
-    # 配置 apt 重试和超时
     echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
     echo 'Acquire::http::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries && \
     echo 'Acquire::https::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries && \
-    # 更新软件源，允许失败后继续
     (apt-get update || apt-get update || apt-get update) && \
     apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -59,11 +57,8 @@ RUN mkdir -p /app/logs /app/data /app/config && \
 COPY pyproject.toml README.md ./
 
 # 安装Python依赖
-# 优化说明：
-# 1. 使用清华镜像加速下载
-# 2. 优先使用预编译的二进制wheel包（--prefer-binary）
-# 3. 避免从源码编译，大幅提升ARM架构构建速度
-# 4. 安装 PDF 导出工具: pdfkit
+# 使用清华镜像加速下载
+# 优先使用预编译的二进制wheel包（--prefer-binary）
 RUN pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple && \
     pip install --prefer-binary . -i https://pypi.tuna.tsinghua.edu.cn/simple && \
     pip install --prefer-binary pdfkit -i https://pypi.tuna.tsinghua.edu.cn/simple
@@ -74,16 +69,15 @@ COPY tradingagents ./tradingagents
 COPY config ./config
 COPY scripts ./scripts
 COPY docs ./docs
-COPY install ./install
 
 # 复制Docker环境配置文件
 COPY .env.docker ./.env
 
-# 暴露后端端口（与docker-compose.v1.0.0.yml一致）
-EXPOSE 8000
+# 暴露后端端口
+EXPOSE 8005
 
 # Docker环境标识
 ENV DOCKER_CONTAINER=true
 
-# 启动FastAPI服务
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 启动旅行规划服务（注意：使用 travel_main 而不是 main）
+CMD ["python", "-m", "uvicorn", "app.travel_main:app", "--host", "0.0.0.0", "--port", "8005"]

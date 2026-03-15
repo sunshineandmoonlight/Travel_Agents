@@ -1,7 +1,7 @@
 version: '3.8'
 
-# TradingAgents-CN v1.0.0-preview Docker Compose配置
-# 支持前后端分离部署
+# TravelAgents v3.0 Docker Compose配置
+# 智能旅行规划系统 - 前后端分离部署
 
 services:
   # FastAPI 后端服务
@@ -9,10 +9,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    image: tradingagents-backend:v1.0.0-preview
-    container_name: tradingagents-backend
+    image: travel-agents-backend:v3.0
+    container_name: travel-agents-backend
     ports:
-      - "8000:8000"
+      - "8005:8005"
     volumes:
       # 日志目录映射
       - ./logs:/app/logs
@@ -21,35 +21,44 @@ services:
       # 数据目录映射
       - ./data:/app/data
     env_file:
-      - .env
+      - .env.docker
     environment:
       PYTHONUNBUFFERED: 1
       PYTHONDONTWRITEBYTECODE: 1
       TZ: "Asia/Shanghai"
       # 日志配置
-      TRADINGAGENTS_LOG_LEVEL: "INFO"
-      TRADINGAGENTS_LOG_DIR: "/app/logs"
-      TRADINGAGENTS_LOG_FILE: "/app/logs/tradingagents.log"
+      LOG_LEVEL: "INFO"
+      LOG_DIR: "/app/logs"
       # Docker专用数据库配置
-      TRADINGAGENTS_MONGODB_URL: mongodb://admin:tradingagents123@mongodb:27017/tradingagents?authSource=admin
-      TRADINGAGENTS_REDIS_URL: redis://:tradingagents123@redis:6379
-      TRADINGAGENTS_CACHE_TYPE: redis
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USERNAME: admin
+      MONGODB_PASSWORD: travel123
+      MONGODB_DATABASE: travel_agents
+      MONGODB_AUTH_SOURCE: admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: travel123
+      REDIS_DB: 0
       # Docker环境标识
       DOCKER_CONTAINER: "true"
       # API配置
       API_HOST: "0.0.0.0"
-      API_PORT: "8000"
+      API_PORT: "8005"
       # CORS配置
-      CORS_ORIGINS: "http://localhost:3000,http://localhost:4000,http://localhost:4001,http://localhost:5173,http://localhost:8080"
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:4000,http://localhost:5173"
+      # LLM配置（需要提供至少一个）
+      # DEEPSEEK_API_KEY: "your-deepseek-key"
+      # DASHSCOPE_API_KEY: "your-dashscope-key"
     depends_on:
       mongodb:
         condition: service_healthy
       redis:
         condition: service_healthy
     networks:
-      - tradingagents-network
+      - travel-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -66,19 +75,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
-    image: tradingagents-frontend:v1.0.0-preview
-    container_name: tradingagents-frontend
+    image: travel-agents-frontend:v3.0
+    container_name: travel-agents-frontend
     ports:
-      - "3000:80"
+      - "4000:80"
     environment:
       TZ: "Asia/Shanghai"
-      # 后端API地址
-      VITE_API_BASE_URL: "http://localhost:8000"
+      # 后端API地址（Docker网络内使用服务名）
+      VITE_API_BASE_URL: "http://backend:8005"
     depends_on:
       backend:
         condition: service_healthy
     networks:
-      - tradingagents-network
+      - travel-network
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost"]
       interval: 30s
@@ -95,20 +104,20 @@ services:
   # MongoDB 数据库服务
   mongodb:
     image: mongo:4.4
-    container_name: tradingagents-mongodb
+    container_name: travel-agents-mongodb
     restart: unless-stopped
     ports:
       - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: tradingagents123
-      MONGO_INITDB_DATABASE: tradingagents
+      MONGO_INITDB_ROOT_PASSWORD: travel123
+      MONGO_INITDB_DATABASE: travel_agents
       TZ: "Asia/Shanghai"
     volumes:
       - mongodb_data:/data/db
-      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./scripts/docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
-      - tradingagents-network
+      - travel-network
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
       interval: 30s
@@ -124,17 +133,17 @@ services:
   # Redis 缓存服务
   redis:
     image: redis:7-alpine
-    container_name: tradingagents-redis
+    container_name: travel-agents-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
     environment:
       TZ: "Asia/Shanghai"
-    command: redis-server --appendonly yes --requirepass tradingagents123
+    command: redis-server --appendonly yes --requirepass travel123
     volumes:
       - redis_data:/data
     networks:
-      - tradingagents-network
+      - travel-network
     healthcheck:
       test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 30s
@@ -150,14 +159,14 @@ services:
   # Redis Commander 管理界面（可选）
   redis-commander:
     image: ghcr.io/joeferner/redis-commander:latest
-    container_name: tradingagents-redis-commander
+    container_name: travel-agents-redis-commander
     restart: unless-stopped
     ports:
       - "8081:8081"
     environment:
-      - REDIS_HOSTS=local:redis:6379:0:tradingagents123
+      - REDIS_HOSTS=local:redis:6379:0:travel123
     networks:
-      - tradingagents-network
+      - travel-network
     depends_on:
       redis:
         condition: service_healthy
@@ -173,18 +182,18 @@ services:
   # Mongo Express 管理界面（可选）
   mongo-express:
     image: mongo-express:latest
-    container_name: tradingagents-mongo-express
+    container_name: travel-agents-mongo-express
     restart: unless-stopped
     ports:
       - "8082:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: tradingagents123
-      ME_CONFIG_MONGODB_URL: mongodb://admin:tradingagents123@mongodb:27017/
+      ME_CONFIG_MONGODB_ADMINPASSWORD: travel123
+      ME_CONFIG_MONGODB_URL: mongodb://admin:travel123@mongodb:27017/
       ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: tradingagents123
+      ME_CONFIG_BASICAUTH_PASSWORD: travel123
     networks:
-      - tradingagents-network
+      - travel-network
     depends_on:
       mongodb:
         condition: service_healthy
@@ -195,14 +204,13 @@ services:
 volumes:
   mongodb_data:
     driver: local
-    name: tradingagents_mongodb_data
+    name: travel_agents_mongodb_data
   redis_data:
     driver: local
-    name: tradingagents_redis_data
+    name: travel_agents_redis_data
 
 # 网络定义
 networks:
-  tradingagents-network:
+  travel-network:
     driver: bridge
-    name: tradingagents-network
-
+    name: travel-network
