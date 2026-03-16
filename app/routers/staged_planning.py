@@ -267,14 +267,14 @@ async def get_destinations_stream(request: TravelRequirementForm):
             llm_status = "enabled" if llm else "disabled"
 
             # 发送开始事件
-            yield f"data: {json.dumps({'type': 'start', 'scope': request.travel_scope, 'llm_enabled': llm_status}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({"type": "start', 'scope': request.travel_scope, 'llm_enabled': llm_status}, ensure_ascii=False)}\n\n"
 
             # 步骤1: 需求分析
-            yield f"data: {json.dumps({'type': 'progress', 'step': '正在分析您的旅行需求...', 'agent': 'UserRequirementAnalyst', 'progress': 10}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({"type": "progress', ', "step": "正在分析您的旅行需求..", ', "agent": "UserRequirementAnalyst', 'progress': 10}, ensure_ascii=False)}\n\n"
             await asyncio.sleep(0.3)
 
             # 步骤2: 匹配目的地
-            yield f"data: {json.dumps({'type': 'progress', 'step': '正在匹配适合的目的地...', 'agent': 'DestinationMatcher', 'progress': 30}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({"type": "progress', ', "step": "正在匹配适合的目的地..", ', "agent": "DestinationMatcher', 'progress': 30}, ensure_ascii=False)}\n\n"
 
             from tradingagents.agents.group_a import recommend_destinations
             requirements = request.dict()
@@ -284,9 +284,9 @@ async def get_destinations_stream(request: TravelRequirementForm):
 
             # 发送用户画像结果
             portrait_data = {
-                'type': 'step_result',
+                "type": "step_result',
                 'step': '用户需求分析完成',
-                'agent': 'UserRequirementAnalyst',
+                "agent": "UserRequirementAnalyst',
                 'data': {
                     'description': result['user_portrait'].get('description', ''),
                     'travel_type': result['user_portrait'].get('travel_type', ''),
@@ -300,39 +300,60 @@ async def get_destinations_stream(request: TravelRequirementForm):
             yield f"data: {json.dumps(portrait_data, ensure_ascii=False)}\n\n"
 
             # 步骤3: 排序推荐
-            yield f"data: {json.dumps({'type': 'progress', 'step': '正在综合评分和排序...', 'agent': 'RankingScorer', 'progress': 70}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({"type": "progress', ', "step": "正在综合评分和排序..", ', "agent": "RankingScorer', 'progress': 70}, ensure_ascii=False)}\n\n"
             await asyncio.sleep(0.3)
 
             # 发送目的地匹配结果
-            yield f"data: {json.dumps({'type': 'step_result', 'step': '目的地匹配完成', 'agent': 'DestinationMatcher', 'data': {
-                'matched_count': len(result['destinations']),
-                'top_destinations': [
-                    {'name': d.get('destination', ''), 'score': d.get('match_score', 0)}
-                    for d in result['destinations'][:5]
-                ],
-                'llm_description': result.get('matching_llm_description', '')
-            }, 'progress': 85}, ensure_ascii=False)}\n\n"
+            destination_match_data = {
+                "type": "step_result',
+                'step': '目的地匹配完成',
+                "agent": "DestinationMatcher',
+                'data': {
+                    'matched_count': len(result['destinations']),
+                    'top_destinations': [
+                        {'name': d.get('destination', ''), 'score': d.get('match_score', 0)}
+                        for d in result['destinations'][:5]
+                    ],
+                    'llm_description': result.get('matching_llm_description', '')
+                },
+                'progress': 85
+            }
+            yield f"data: {json.dumps(destination_match_data, ensure_ascii=False)}\n\n"
 
             # 最终排序结果
-            yield f"data: {json.dumps({'type': 'step_result', 'step': '推荐排序完成', 'agent': 'RankingScorer', 'data': {
-                'total_count': len(result['destinations']),
-                'recommended_destinations': result['destinations'],
-                'llm_description': result.get('ranking_llm_description', '')
-            }, 'progress': 95}, ensure_ascii=False)}\n\n"
+            ranking_data = {
+                "type": "step_result',
+                'step': '推荐排序完成',
+                "agent": "RankingScorer',
+                'data': {
+                    'total_count': len(result['destinations']),
+                    'recommended_destinations': result['destinations'],
+                    'llm_description': result.get('ranking_llm_description', '')
+                },
+                'progress': 95
+            }
+            yield f"data: {json.dumps(ranking_data, ensure_ascii=False)}\n\n"
 
             # 完成
-            yield f"data: {json.dumps({'type': 'complete', 'progress': 100, 'destinations': result['destinations'], 'user_portrait': {
-                'description': result['user_portrait']['description'],
-                'travel_type': result['user_portrait']['travel_type'],
-                'pace_preference': result['user_portrait']['pace_preference'],
-                'budget_level': result['user_portrait']['budget_level']
-            }}, ensure_ascii=False)}\n\n"
+            complete_data = {
+                'type': "complete",
+                'progress': 100,
+                'destinations': result['destinations'],
+                'user_portrait': {
+                    'description': result['user_portrait']['description'],
+                    'travel_type': result['user_portrait']['travel_type'],
+                    'pace_preference': result['user_portrait']['pace_preference'],
+                    'budget_level': result['user_portrait']['budget_level']
+                }
+            }
+            yield f"data: {json.dumps(complete_data, ensure_ascii=False)}\n\n"
 
             logger.info(f"[分阶段规划] 推荐完成: {len(result['destinations'])}个目的地")
 
         except Exception as e:
             logger.error(f"[分阶段规划] 流式获取推荐地区失败: {e}", exc_info=True)
-            yield f"data: {json.dumps({'type': 'error', 'message': str(e)}, ensure_ascii=False)}\n\n"
+            error_data = {"type": "error', 'message': str(e)}
+            yield f"data: {json.dumps(error_data, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
@@ -453,7 +474,7 @@ async def get_styles_stream(request: GetStylesRequest):
             llm = get_llm_instance()
 
             # 发送开始事件
-            yield f"data: {json.dumps({'type': 'start', 'destination': request.destination}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({"type": "start', 'destination': request.destination}, ensure_ascii=False)}\n\n"
 
             # 获取目的地数据
             travel_scope = request.user_requirements.get("travel_scope", "domestic")
@@ -469,14 +490,14 @@ async def get_styles_stream(request: GetStylesRequest):
             destination_cn = normalize_destination_name(request.destination)
             dest_data = dest_db.get(destination_cn, {})
             if not dest_data:
-                yield f"data: {json.dumps({'type': 'error', 'message': f'目的地 {request.destination} 未找到'}, ensure_ascii=False)}\n\n"
+                yield f"data: {json.dumps({"type": "error', 'message': f'目的地 {request.destination} 未找到'}, ensure_ascii=False)}\n\n"
                 return
 
             user_portrait = request.user_requirements.get("user_portrait", {})
             days = request.user_requirements.get("days", 5)
 
             # 🚀 并行执行4个风格设计师
-            yield f"data: {json.dumps({'type': 'progress', 'step': '4个风格设计师正在并行工作...', 'agent': '组B智能体', 'progress': 10}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({"type": "progress', ', "step": "4个风格设计师正在并行工作..", ', "agent": "组B智能体', 'progress': 10}, ensure_ascii=False)}\n\n"
 
             from tradingagents.agents.group_b import generate_style_proposals_parallel
 
@@ -493,7 +514,7 @@ async def get_styles_stream(request: GetStylesRequest):
                 progress = 20 + (idx + 1) * 15
                 style_name = style.get('style_name', '')
                 style_type = style.get('style_type', '').capitalize()
-                yield f"data: {json.dumps({'type': 'step_result', 'step': f'{style_name}方案完成', 'agent': f'{style_type}Designer', 'data': {
+                yield f"data: {json.dumps({"type": "step_result', 'step': f'{style_name}方案完成', 'agent': f'{style_type}Designer', 'data': {
                     'style_name': style.get('style_name'),
                     'style_type': style.get('style_type'),
                     'description': style.get('style_description'),
@@ -504,7 +525,7 @@ async def get_styles_stream(request: GetStylesRequest):
                 }, 'progress': progress, 'llm_description': style.get('llm_description', '')}, ensure_ascii=False)}\n\n"
 
             # 完成
-            yield f"data: {json.dumps({'type': 'complete', 'progress': 100, 'styles': all_styles, 'destination_info': {
+            yield f"data: {json.dumps({'type': "complete", 'progress': 100, 'styles': all_styles, 'destination_info': {
                 'destination': request.destination,
                 'highlights': dest_data.get('highlights', [])[:5],
                 'best_season': dest_data.get('best_season', ''),
@@ -515,7 +536,8 @@ async def get_styles_stream(request: GetStylesRequest):
 
         except Exception as e:
             logger.error(f"[分阶段规划] 流式获取风格方案失败: {e}", exc_info=True)
-            yield f"data: {json.dumps({'type': 'error', 'message': str(e)}, ensure_ascii=False)}\n\n"
+            error_data = {"type": "error', 'message': str(e)}
+            yield f"data: {json.dumps(error_data, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
@@ -1026,13 +1048,13 @@ async def get_destinations_stream_simple(request: TravelRequirementForm):
     import json
 
     async def generate():
-        yield f"data: {json.dumps({'type': 'start', 'message': '开始处理...'}, ensure_ascii=False)}\n\n"
+        yield f"data: {json.dumps({"type": "start', 'message': '开始处理...'}, ensure_ascii=False)}\n\n"
         await __import__('asyncio').sleep(0.5)
-        yield f"data: {json.dumps({'type': 'progress', 'step': '分析需求中...', 'progress': 30}, ensure_ascii=False)}\n\n"
+        yield f"data: {json.dumps({"type": "progress', ', "step": "分析需求中..", ', 'progress': 30}, ensure_ascii=False)}\n\n"
         await __import__('asyncio').sleep(0.5)
-        yield f"data: {json.dumps({'type': 'progress', 'step': '匹配目的地...', 'progress': 60}, ensure_ascii=False)}\n\n"
+        yield f"data: {json.dumps({"type": "progress', ', "step": "匹配目的地..", ', 'progress': 60}, ensure_ascii=False)}\n\n"
         await __import__('asyncio').sleep(0.5)
-        yield f"data: {json.dumps({'type': 'complete', 'progress': 100, 'destinations': [], 'user_portrait': {'description': '测试用户画像'}}, ensure_ascii=False)}\n\n"
+        yield f"data: {json.dumps({'type': "complete", 'progress': 100, 'destinations': [], 'user_portrait': {'description': '测试用户画像'}}, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(generate(), media_type="text/event-stream")
 
@@ -1061,7 +1083,7 @@ async def generate_guide_stream(request: GenerateGuideRequest):
             llm_status = "enabled" if llm else "disabled"
 
             # 发送开始事件
-            yield f"data: {json.dumps({'type': 'start', 'destination': request.destination, 'llm_enabled': llm_status}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({"type": "start', 'destination': request.destination, 'llm_enabled': llm_status}, ensure_ascii=False)}\n\n"
 
             # 获取目的地数据
             travel_scope = request.user_requirements.get("travel_scope", "domestic")
@@ -1078,7 +1100,7 @@ async def generate_guide_stream(request: GenerateGuideRequest):
 
             dest_data = dest_db.get(destination_cn, {})
             if not dest_data:
-                yield f"data: {json.dumps({'type': 'error', 'message': f'目的地 {request.destination} 未找到'}, ensure_ascii=False)}\n\n"
+                yield f"data: {json.dumps({"type": "error', 'message': f'目的地 {request.destination} 未找到'}, ensure_ascii=False)}\n\n"
                 return
 
             # 获取用户信息
@@ -1087,7 +1109,7 @@ async def generate_guide_stream(request: GenerateGuideRequest):
             start_date = request.user_requirements.get("start_date", datetime.now().strftime("%Y-%m-%d"))
 
             # 步骤1: 生成风格方案
-            yield f"data: {json.dumps({'type': 'progress', 'step': '智能体并行工作中...', 'agent': 'Group B', 'progress': 10}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({"type": "progress', ', "step": "智能体并行工作中..", ', "agent": "Group B', 'progress': 10}, ensure_ascii=False)}\n\n"
             await asyncio.sleep(0.2)
 
             # 🚀 使用并行版本：4个风格设计师同时工作
@@ -1111,7 +1133,7 @@ async def generate_guide_stream(request: GenerateGuideRequest):
                 selected_style = all_styles[0]
 
             # 发送详细的风格方案数据
-            yield f"data: {json.dumps({'type': 'step_result', 'step': '风格方案生成', 'agent': '组B智能体', 'data': {
+            yield f"data: {json.dumps({"type": "step_result', 'step': '风格方案生成', "agent": "组B智能体', 'data': {
                 'style_count': len(all_styles),
                 'selected': request.style_type,
                 'style_name': selected_style.get('style_name', ''),
@@ -1129,7 +1151,7 @@ async def generate_guide_stream(request: GenerateGuideRequest):
             }, 'progress': 20}, ensure_ascii=False)}\n\n"
 
             # 步骤2: 景点排程
-            yield f"data: {json.dumps({'type': 'progress', 'step': '景点排程中', 'agent': 'AttractionScheduler', 'progress': 30}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({"type": "progress', 'step': '景点排程中', "agent": "AttractionScheduler', 'progress': 30}, ensure_ascii=False)}\n\n"
             await asyncio.sleep(0.3)
 
             from tradingagents.agents.group_c import schedule_attractions
@@ -1202,7 +1224,7 @@ async def generate_guide_stream(request: GenerateGuideRequest):
                     'pace': day_schedule.get('pace', '中等')
                 })
 
-            yield f"data: {json.dumps({'type': 'step_result', 'step': '景点排程完成', 'agent': 'AttractionScheduler', 'data': {
+            yield f"data: {json.dumps({"type": "step_result', 'step': '景点排程完成', "agent": "AttractionScheduler', 'data': {
                 'days': len(scheduled_attractions),
                 'daily_schedule': daily_schedule_summary,
                 'total_attractions': sum(len(day.get('schedule', [])) for day in scheduled_attractions),
@@ -1215,7 +1237,7 @@ async def generate_guide_stream(request: GenerateGuideRequest):
             logger.info(f"[分阶段规划] 开始并行执行交通、餐饮、住宿智能体")
 
             # 发送并行执行开始事件
-            yield f"data: {json.dumps({'type': 'progress', 'step': '智能体并行工作中...', 'agent': 'Group C', 'progress': 50}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({"type": "progress', ', "step": "智能体并行工作中..", ', "agent": "Group C', 'progress': 50}, ensure_ascii=False)}\n\n"
 
             # 准备并行任务
             from tradingagents.agents.group_c import plan_transport, recommend_dining, recommend_accommodation
@@ -1279,19 +1301,19 @@ async def generate_guide_stream(request: GenerateGuideRequest):
                     if name == 'transport':
                         transport_plan = data
                         # 返回完整的交通规划数据
-                        yield f"data: {json.dumps({'type': 'step_result', 'step': '交通规划完成', 'agent': 'TransportPlanner', 'data': transport_plan, 'progress': 65}, ensure_ascii=False)}\n\n"
+                        yield f"data: {json.dumps({"type": "step_result', 'step': '交通规划完成', "agent": "TransportPlanner', 'data': transport_plan, 'progress': 65}, ensure_ascii=False)}\n\n"
                     elif name == 'dining':
                         dining_plan = data
                         # 返回完整的餐饮推荐数据
-                        yield f"data: {json.dumps({'type': 'step_result', 'step': '餐饮推荐完成', 'agent': 'DiningRecommender', 'data': dining_plan, 'progress': 80}, ensure_ascii=False)}\n\n"
+                        yield f"data: {json.dumps({"type": "step_result', 'step': '餐饮推荐完成', "agent": "DiningRecommender', 'data': dining_plan, 'progress': 80}, ensure_ascii=False)}\n\n"
                     elif name == 'accommodation':
                         accommodation_plan = data
-                        yield f"data: {json.dumps({'type': 'step_result', 'step': '住宿建议完成', 'agent': 'AccommodationAdvisor', 'data': accommodation_plan, 'progress': 85}, ensure_ascii=False)}\n\n"
+                        yield f"data: {json.dumps({"type": "step_result', 'step': '住宿建议完成', "agent": "AccommodationAdvisor', 'data': accommodation_plan, 'progress': 85}, ensure_ascii=False)}\n\n"
 
             logger.info(f"[分阶段规划] 并行执行完成，3个智能体结果已收集")
 
             # 步骤6: 格式化攻略
-            yield f"data: {json.dumps({'type': 'progress', 'step': '整合完整攻略', 'agent': 'GuideFormatter', 'progress': 98}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({"type": "progress', 'step': '整合完整攻略', "agent": "GuideFormatter', 'progress': 98}, ensure_ascii=False)}\n\n"
             await asyncio.sleep(0.2)
 
             from tradingagents.agents.group_c import format_detailed_guide
@@ -1307,11 +1329,12 @@ async def generate_guide_stream(request: GenerateGuideRequest):
             )
 
             # 完成
-            yield f"data: {json.dumps({'type': 'complete', 'progress': 100, 'message': '详细攻略生成完成！', 'guide': detailed_guide}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({'type': "complete", 'progress': 100, 'message': '详细攻略生成完成！', 'guide': detailed_guide}, ensure_ascii=False)}\n\n"
 
         except Exception as e:
             logger.error(f"[分阶段规划] 流式生成失败: {e}", exc_info=True)
-            yield f"data: {json.dumps({'type': 'error', 'message': str(e)}, ensure_ascii=False)}\n\n"
+            error_data = {"type": "error', 'message': str(e)}
+            yield f"data: {json.dumps(error_data, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
