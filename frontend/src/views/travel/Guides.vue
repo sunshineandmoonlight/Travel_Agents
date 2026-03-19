@@ -66,20 +66,8 @@
         >
           <!-- 攻略封面 -->
           <div class="guide-cover">
-            <div v-if="guide.cover" class="image-wrapper">
-              <img
-                :src="guide.cover"
-                :alt="guide.title"
-                @load="(e) => handleImageLoad(e, guide.id)"
-                @error="(e) => handleImageError(e, guide.id)"
-                :class="{ 'image-loaded': isImageLoaded[guide.id], 'image-error': hasImageError[guide.id] }"
-                loading="lazy"
-              />
-              <div v-if="!isImageLoaded[guide.id] && !hasImageError[guide.id]" class="image-loading">
-                <el-icon class="is-loading"><Loading /></el-icon>
-              </div>
-            </div>
-            <div v-else class="cover-placeholder">
+            <!-- 占位符（始终显示，作为背景） -->
+            <div class="cover-placeholder-bg">
               <svg viewBox="0 0 48 48" fill="none">
                 <rect width="48" height="48" rx="12" fill="url(#cover-gradient)" />
                 <path d="M24 16L28 22H36L30 28L32 36L24 31L16 36L18 28L12 22H20L24 16Z" fill="white" fill-opacity="0.3"/>
@@ -90,6 +78,17 @@
                   </linearGradient>
                 </defs>
               </svg>
+            </div>
+            <!-- 实际图片（加载后覆盖在占位符上） -->
+            <div v-if="guide.cover" class="image-wrapper" :class="{ 'image-loaded': isImageLoaded[guide.id] }">
+              <img
+                :src="guide.cover"
+                :alt="guide.title"
+                @load="(e) => handleImageLoad(e, guide.id)"
+                @error="(e) => handleImageError(e, guide.id)"
+                :class="{ 'img-loaded': isImageLoaded[guide.id] }"
+                loading="lazy"
+              />
             </div>
             <div class="cover-badge">
               <el-tag :type="getStatusType(guide.status)" size="small" effect="plain">
@@ -215,19 +214,12 @@
             @click="openKnowledgeArticle(article)"
           >
             <div class="article-image">
-              <div class="image-wrapper">
-                <img
+              <img
                   :src="article.image"
                   :alt="article.title"
-                  @load="(e) => handleImageLoad(e, 'kb-' + article.id)"
                   @error="(e) => handleImageError(e, 'kb-' + article.id)"
-                  :class="{ 'image-loaded': isImageLoaded['kb-' + article.id], 'image-error': hasImageError['kb-' + article.id] }"
                   loading="lazy"
-                />
-                <div v-if="!isImageLoaded['kb-' + article.id] && !hasImageError['kb-' + article.id]" class="image-loading">
-                  <el-icon class="is-loading"><Loading /></el-icon>
-                </div>
-              </div>
+              />
               <div class="article-badge">{{ getCategoryName(article.category) }}</div>
             </div>
             <div class="article-content">
@@ -354,7 +346,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, shallowRef, markRaw } from 'vue'
+import { ref, computed, onMounted, onActivated, shallowRef, markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -401,7 +393,7 @@ const showGuideDetailModal = ref(false)
 const currentGuideDetail = ref<GuideDetail | null>(null)
 const isImageLoaded = ref<Record<string, boolean>>({})
 const hasImageError = ref<Record<string, boolean>>({})
-const loading = ref(false)
+const loading = ref(true)
 const loadingDetail = ref(false)
 
 // 攻略列表（从API加载）
@@ -413,10 +405,15 @@ const loadGuides = async () => {
   try {
     // 使用 demo_user ID 来获取用户自己的攻略
     const userId = 'demo_user'
-    const data = await getUserGuides(userId, undefined, 50, 0)
-    // 为每个攻略异步获取图片URL
-    const guidesWithImages = await Promise.all(data.map(async (guide: any) => {
-      const coverUrl = await getGuideImageUrlAsync(guide.destination, 600, 400)
+    const data = await getUserGuides(userId, undefined, 20, 0)
+    // 直接使用后端返回的 thumbnail_url，不再异步加载
+    const guidesWithImages = data.map((guide: any) => {
+      // 后端已经返回了 thumbnail_url，直接使用
+      let coverUrl = guide.thumbnail_url || guide.cover_image
+      // 如果后端没有返回，使用占位图
+      if (!coverUrl) {
+        coverUrl = `https://placehold.co/600x400?text=${encodeURIComponent(guide.destination)}`
+      }
       return {
         ...guide,
         days: guide.total_days,
@@ -428,7 +425,7 @@ const loadGuides = async () => {
         cover: coverUrl,
         content: '' // 内容从详情页获取
       }
-    }))
+    })
     guides.value = guidesWithImages
     console.log('加载我的攻略列表成功:', guides.value.length)
   } catch (error) {
@@ -444,7 +441,13 @@ onMounted(() => {
   loadGuides()
 })
 
+// 当组件从 keep-alive 激活时重新加载
+onActivated(() => {
+  loadGuides()
+})
+
 // 攻略知识库数据 - 硬编码内容
+// 使用 Unsplash 图片（和攻略卡片相同的图片源）
 const knowledgeArticles = ref([
   {
     id: 1,
@@ -646,6 +649,20 @@ const getCategoryName = (categoryId: string) => {
   return cat?.name || ''
 }
 
+// 获取分类图标
+const getCategoryIcon = (categoryId: string) => {
+  const icons = {
+    'planning': '✈️',
+    'budget': '💰',
+    'photography': '📷',
+    'destinations': '🗺️',
+    'food': '🍜',
+    'safety': '🏥',
+    'all': '📚'
+  }
+  return icons[categoryId] || '📖'
+}
+
 // 打开知识库文章
 const openKnowledgeArticle = (article: any) => {
   currentKnowledgeArticle.value = article
@@ -718,8 +735,34 @@ const handleImageLoad = (event: any, guideId: string) => {
 }
 
 const handleImageError = (event: any, guideId: string) => {
-  isImageLoaded.value[guideId] = false
-  hasImageError.value[guideId] = true
+  const img = event.target
+  const originalSrc = img.src
+
+  // 如果是 Pixabay 图片加载失败，替换为 Unsplash 图片
+  if (originalSrc.includes('pixabay.com')) {
+    // 根据不同的 guideId 生成不同的 Unsplash 图片
+    const unsplashImages = [
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600',
+      'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600',
+      'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=600',
+      'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600',
+      'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=600',
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600',
+      'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600',
+      'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=600'
+    ]
+    // 使用 guideId 的 hash 来选择一个固定的图片
+    const hash = guideId.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0)
+      return a & a
+    }, 0)
+    const index = Math.abs(hash) % unsplashImages.length
+    img.src = unsplashImages[index]
+    hasImageError.value[guideId] = false
+  } else {
+    isImageLoaded.value[guideId] = false
+    hasImageError.value[guideId] = true
+  }
 }
 
 const handleAction = async (command: string, guide: any) => {
@@ -940,29 +983,51 @@ const formatNumber = (num: number) => {
   position: relative;
   height: 200px;
   overflow: hidden;
+}
+
+/* 占位符背景（始终显示） */
+.cover-placeholder-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
   background: linear-gradient(135deg, #0EA5E9 0%, #F97316 100%);
 }
 
-.image-wrapper {
+.cover-placeholder-bg svg {
   width: 100%;
   height: 100%;
-  position: relative;
+}
+
+/* 图片层（覆盖在占位符上） */
+.image-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+  z-index: 1;
+}
+
+.image-wrapper.image-loaded {
+  opacity: 1;
 }
 
 .guide-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
 }
 
-.guide-cover img.image-loaded {
+.guide-cover img.img-loaded {
   opacity: 1;
-}
-
-.guide-cover img.image-error {
-  display: none;
 }
 
 .image-loading {
@@ -975,6 +1040,11 @@ const formatNumber = (num: number) => {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  z-index: 2;
+}
+
+.article-image .image-loading {
+  background: transparent;
 }
 
 .image-loading .el-icon {
@@ -992,24 +1062,11 @@ const formatNumber = (num: number) => {
   }
 }
 
-.cover-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-}
-
-.cover-placeholder svg {
-  width: 100%;
-  height: 100%;
-}
-
 .cover-badge {
   position: absolute;
   top: 16px;
   right: 16px;
+  z-index: 2;
 }
 
 /* 攻略信息 */
@@ -1234,6 +1291,7 @@ const formatNumber = (num: number) => {
   position: relative;
   height: 180px;
   overflow: hidden;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
 }
 
 .article-image .image-wrapper {
@@ -1246,12 +1304,8 @@ const formatNumber = (num: number) => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0;
-  transition: transform 0.3s, opacity 0.3s ease-in-out;
-}
-
-.article-image img.image-loaded {
   opacity: 1;
+  transition: transform 0.3s ease-in-out;
 }
 
 .article-image img.image-error {

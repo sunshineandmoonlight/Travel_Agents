@@ -42,24 +42,25 @@ for env_file in env_files:
 
 # API配置 - 在load_dotenv之后获取
 UNSPLASH_ACCESS_KEY = os.getenv("UNSPLASH_ACCESS_KEY", "")
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
+PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY", "55043899-432c3ed0cfc03f4d6bd00b09e")  # Pixabay 作为默认
+# PEXELS_API_KEY 已弃用 - 使用 Pixabay 替代
 
 # 如果环境变量未加载，直接设置（临时调试）
 if not UNSPLASH_ACCESS_KEY or UNSPLASH_ACCESS_KEY == "your_unsplash_key_here":
     UNSPLASH_ACCESS_KEY = "TXRusbT1Jvwq9V0LXNBeqpA0eQ2vU92LGUpQZw_JMtk"
     logger.warning("[图片] 使用硬编码的UNSPLASH_ACCESS_KEY")
 
-if not PEXELS_API_KEY:
-    PEXELS_API_KEY = "VQQmqFlIXaalCPZBGcS4IHuPl52J9mzJgs1c3tbcFwGPuDBafgf5GaWj"
-    logger.warning("[图片] 使用硬编码的PEXELS_API_KEY")
+# PEXELS_API_KEY 已完全移除 - 仅使用 Pixabay + Unsplash
+# Pexels 已弃用，因为图片匹配度不高，现在使用 Pixabay 作为主要图片来源
 
 logger.info(f"[图片] UNSPLASH_ACCESS_KEY: {'已设置 (' + UNSPLASH_ACCESS_KEY[:10] + '...)' if UNSPLASH_ACCESS_KEY else '未设置'}")
-logger.info(f"[图片] PEXELS_API_KEY: {'已设置 (' + PEXELS_API_KEY[:10] + '...)' if PEXELS_API_KEY else '未设置'}")
+logger.info(f"[图片] PIXABAY_API_KEY: {'已设置 (' + PIXABAY_API_KEY[:10] + '...)' if PIXABAY_API_KEY else '未设置'}")
+logger.info(f"[图片] 图片获取优先级: 🥇 Pixabay → 🥈 Unsplash → ⚠️ 占位图")
 
 
 # 中文名称到英文名称的映射表
 CITY_NAME_MAP = {
-    # 中国城市
+    # 中国城市（都加上 China 以提高搜索准确性）
     "北京": "Beijing China",
     "上海": "Shanghai China",
     "广州": "Guangzhou China",
@@ -79,6 +80,28 @@ CITY_NAME_MAP = {
     "大理": "Dali China",
     "三亚": "Sanya China",
     "拉萨": "Lhasa China",
+    "张家界": "Zhangjiajie China",
+    "黄山": "Huangshan China",
+    "九寨沟": "Jiuzhaigou China",
+    "昆明": "Kunming China",
+    "贵阳": "Guiyang China",
+    "兰州": "Lanzhou China",
+    "银川": "Yinchuan China",
+    "西宁": "Xining China",
+    "乌鲁木齐": "Urumqi China",
+    "拉萨": "Lhasa China",
+    "呼和浩特": "Hohhot China",
+    "沈阳": "Shenyang China",
+    "长春": "Changchun China",
+    "哈尔滨": "Harbin China",
+    "济南": "Jinan China",
+    "郑州": "Zhengzhou China",
+    "合肥": "Hefei China",
+    "福州": "Fuzhou China",
+    "南昌": "Nanchang China",
+    "长沙": "Changsha China",
+    "南宁": "Nanning China",
+    "海口": "Haikou China",
     "香港": "Hong Kong",
     "澳门": "Macau",
     "台北": "Taipei",
@@ -438,6 +461,64 @@ def build_search_query(attraction_name: str, city: str) -> str:
         return f"{attraction_en} {city_en}"
 
 
+def build_optimized_search_query(attraction_name: str, city: str, api_type: str = "unsplash") -> str:
+    """
+    构建优化的搜索查询 - 针对 Unsplash 和 Pixabay 分别优化
+
+    对于中国景点：
+    - 确保包含 "China" 关键词（除非是港澳台）
+    - 使用更精确的英文景点名称
+    - 添加旅行相关关键词
+
+    Args:
+        attraction_name: 景点名称
+        city: 城市名称
+        api_type: API 类型 ("unsplash", "pexels", 或 "pixabay")
+
+    Returns:
+        优化的搜索关键词
+    """
+    # 获取基础搜索词
+    base_query = build_search_query(attraction_name, city)
+
+    # 判断是否是中国大陆城市
+    china_cities = {
+        "北京", "上海", "广州", "深圳", "成都", "重庆", "西安", "杭州",
+        "南京", "苏州", "武汉", "厦门", "青岛", "大连", "桂林", "丽江",
+        "大理", "三亚", "拉萨", "张家界", "黄山", "九寨沟", "昆明", "贵阳",
+        "兰州", "银川", "西宁", "乌鲁木齐", "呼和浩特", "沈阳", "长春",
+        "哈尔滨", "济南", "郑州", "合肥", "福州", "南昌", "长沙", "南宁", "海口"
+    }
+
+    # 对于 Pixabay，添加额外的优化
+    if api_type == "pixabay":
+        # Pixabay 支持更多搜索参数，但基础查询已经足够好
+        if city in china_cities:
+            # 确保查询包含 China 和 travel 关键词
+            if "china" not in base_query.lower():
+                # 如果景点名已经是英文，添加 China
+                if not any('\u4e00' <= char <= '\u9fff' for char in base_query):
+                    base_query = f"{base_query} China travel"
+                else:
+                    # 包含中文，使用城市英文映射
+                    city_en = CITY_NAME_MAP.get(city, city)
+                    base_query = f"{city_en} travel"
+
+        # 移除可能的重复词
+        words = base_query.split()
+        seen = set()
+        optimized_words = []
+        for word in words:
+            if word.lower() not in seen:
+                seen.add(word.lower())
+                optimized_words.append(word)
+        base_query = " ".join(optimized_words)
+
+    logger.info(f"[图片] {api_type.upper()} 优化搜索: {base_query} (原始: {city} - {attraction_name})")
+
+    return base_query
+
+
 class AttractionImageService:
     """景点图片服务类"""
 
@@ -493,7 +574,10 @@ def get_attraction_image(
     """
     获取景点图片URL
 
-    优先使用 Unsplash，失败后使用 Pexels，持续重试直到成功
+    图片获取优先级：
+    1. 🥇 Pixabay - 5,000次/小时，400万+图片，旅行匹配度高
+    2. 🥈 Unsplash - 50次/小时，500万+图片，高质量
+    3. ⚠️ 占位图 - 所有API失败时的备选
 
     使用随机化策略减少重复图片
 
@@ -516,19 +600,18 @@ def get_attraction_image(
             logger.info(f"[图片] 使用天行数据优化景点名称: {attraction_name} -> {enhanced_name}")
             attraction_name = enhanced_name
 
-    # 构建优化的英文搜索关键词
-    query = build_search_query(attraction_name, city)
-    logger.info(f"[图片] 搜索关键词: {query} (原始: {city} - {attraction_name})")
-
-    # 尝试 Unsplash
+    # 🥇 优先尝试 Unsplash（连接更稳定，国内访问友好）
     if UNSPLASH_ACCESS_KEY and UNSPLASH_ACCESS_KEY != "your_unsplash_key_here":
+        # 为 Unsplash 构建优化的搜索关键词
+        unsplash_query = build_optimized_search_query(attraction_name, city, api_type="unsplash")
+
         for attempt in range(max_retries):
             try:
                 # 使用随机页码获取不同结果 (1-5页)
                 random_page = random.randint(1, 5)
-                url = _get_unsplash_image(query, width, height, page=random_page)
+                url = _get_unsplash_image(unsplash_query, width, height, page=random_page)
                 if url:
-                    logger.info(f"[图片] Unsplash成功: {city} - {attraction_name} (页码: {random_page})")
+                    logger.info(f"[图片] ✅ Unsplash成功: {city} - {attraction_name} (页码: {random_page})")
                     return url
                 logger.warning(f"[图片] Unsplash返回空，重试 {attempt + 1}/{max_retries}")
                 time.sleep(0.5)
@@ -537,22 +620,25 @@ def get_attraction_image(
                 if attempt < max_retries - 1:
                     time.sleep(0.5)
 
-    # 尝试 Pexels
-    if PEXELS_API_KEY:
+    # 🥈 Pixabay（作为备用，国内连接可能不稳定）
+    if PIXABAY_API_KEY:
+        # 为 Pixabay 构建优化的搜索关键词
+        pixabay_query = build_optimized_search_query(attraction_name, city, api_type="pixabay")
+
         for attempt in range(max_retries):
             try:
                 # 使用随机页码获取不同结果 (1-5页)
                 random_page = random.randint(1, 5)
-                url = _get_pexels_image(query, width, height, page=random_page)
+                url = _get_pixabay_image(pixabay_query, width, height, page=random_page)
                 if url:
-                    logger.info(f"[图片] Pexels成功: {city} - {attraction_name} (页码: {random_page})")
+                    logger.info(f"[图片] ✅ Pixabay成功: {city} - {attraction_name} (页码: {random_page})")
                     return url
-                logger.warning(f"[图片] Pexels返回空，重试 {attempt + 1}/{max_retries}")
-                time.sleep(0.5)
+                logger.warning(f"[图片] Pixabay返回空，重试 {attempt + 1}/{max_retries}")
+                time.sleep(0.3)
             except Exception as e:
-                logger.warning(f"[图片] Pexels失败 (尝试 {attempt + 1}/{max_retries}): {e}")
+                logger.warning(f"[图片] Pixabay失败 (尝试 {attempt + 1}/{max_retries}): {e}")
                 if attempt < max_retries - 1:
-                    time.sleep(0.5)
+                    time.sleep(0.3)
 
     # 都失败了，使用占位图
     logger.warning(f"[图片] 所有API失败，使用占位图: {city} - {attraction_name}")
@@ -606,9 +692,15 @@ def _get_unsplash_image(query: str, width: int, height: int, page: int = 1) -> O
         return None
 
 
-def _get_pexels_image(query: str, width: int, height: int, page: int = 1) -> Optional[str]:
+def _get_pixabay_image(query: str, width: int, height: int, page: int = 1) -> Optional[str]:
     """
-    从 Pexels 获取图片
+    从 Pixabay 获取图片
+
+    Pixabay API 特点：
+    - 免费额度高：5,000次/小时
+    - 图片数量多：400万+ 张
+    - 支持中文搜索（lang=zh）
+    - category 参数可以过滤 "travel" 类别
 
     Args:
         query: 搜索关键词（英文）
@@ -619,34 +711,43 @@ def _get_pexels_image(query: str, width: int, height: int, page: int = 1) -> Opt
     Returns:
         图片URL或None
     """
-    url = "https://api.pexels.com/v1/search"
+    url = "https://pixabay.com/api/"
     params = {
-        "query": query,
-        "per_page": 1,
-        "orientation": "landscape" if width > height else "portrait",
+        "key": PIXABAY_API_KEY,
+        "q": query,
+        "per_page": 3,  # 返回多张，选择最佳
+        "image_type": "photo",
+        "orientation": "horizontal" if width > height else "vertical",
+        "category": "places",  # 旅行相关类别
+        "safesearch": "true",
         "page": page,
-        "size": "large"
-    }
-    headers = {
-        "Authorization": PEXELS_API_KEY
+        "min_width": width // 2,  # 确保图片质量
+        "min_height": height // 2
     }
 
     try:
-        response = requests.get(url, params=params, headers=headers, timeout=10)
+        response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
 
         data = response.json()
-        photos = data.get("photos", [])
+        hits = data.get("hits", [])
 
-        if photos:
-            photo = photos[0]
-            # Pexels 返回的图片已经是完整URL
-            return photo["src"]["large"]
+        if hits:
+            # 选择第一张图片
+            hit = hits[0]
+            # 优先使用 fullHDURL，其次 largeImageURL，最后 webformatURL
+            photo_url = (
+                hit.get("fullHDURL") or
+                hit.get("largeImageURL") or
+                hit.get("webformatURL")
+            )
+            logger.info(f"[Pixabay] 找到 {len(hits)} 张图片 (总计: {data.get('totalHits', 0)})")
+            return photo_url
 
         return None
 
     except Exception as e:
-        logger.error(f"[Pexels API错误] {e}")
+        logger.error(f"[Pixabay API错误] {e}")
         return None
 
 

@@ -1,18 +1,28 @@
 """
 旅行攻略保存和管理API
 使用MongoDB持久化存储
+Redis缓存支持
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Query
-from fastapi.responses import Response, FileResponse
+from fastapi import APIRouter, HTTPException, Depends, Query, Response
 from typing import Optional, List
 from pydantic import BaseModel, Field
 from datetime import datetime
 from bson import ObjectId
 import logging
 from enum import Enum
+from fastapi.responses import JSONResponse
+import json
 
 logger = logging.getLogger(__name__)
+
+
+class DateTimeEncoder(json.JSONEncoder):
+    """自定义JSON编码器，处理datetime对象"""
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
 
 router = APIRouter(prefix="/guides-center", tags=["旅行攻略"])
 
@@ -81,6 +91,44 @@ class GuideDetail(BaseModel):
 
 # MongoDB集合名称
 COLLECTION_NAME = "travel_guides"
+
+# Redis缓存配置
+CACHE_TTL = 300  # 5分钟缓存
+
+
+async def _get_redis_client():
+    """获取Redis客户端"""
+    try:
+        from app.core.database import get_redis_client
+        return get_redis_client()
+    except Exception as e:
+        logger.warning(f"Redis客户端获取失败: {e}")
+        return None
+
+
+def _make_cache_key(user_id: str, limit: int = 20, offset: int = 0, status: Optional[str] = None) -> str:
+    """生成缓存键"""
+    if status:
+        return f"guides:list:{user_id}:{status}:{limit}:{offset}"
+    return f"guides:list:{user_id}:{limit}:{offset}"
+
+
+async def _invalidate_guides_cache(user_id: str, redis_client=None):
+    """使用户攻略缓存失效"""
+    try:
+        if redis_client is None:
+            redis_client = await _get_redis_client()
+        if redis_client is None:
+            return
+
+        # 删除所有匹配的缓存键
+        pattern = f"guides:list:{user_id}:*"
+        keys = await redis_client.keys(pattern)
+        if keys:
+            await redis_client.delete(*keys)
+            logger.info(f"清除缓存: {len(keys)} 个键")
+    except Exception as e:
+        logger.warning(f"清除缓存失败: {e}")
 
 
 async def _get_guides_collection():
@@ -213,6 +261,9 @@ async def save_guide(request: SaveGuideRequest):
         # 保存到MongoDB
         await collection.insert_one(guide_record)
 
+        # 清除用户缓存
+        await _invalidate_guides_cache(request.user_id)
+
         logger.info(f"攻略保存成功: {guide_id} - {request.title}")
 
         return {
@@ -261,7 +312,11 @@ async def get_public_guides(
             doc["id"] = doc.get("id", str(doc.get("_id", "")))
             public_guides.append(GuideListItem(**doc))
 
-        return public_guides
+        # 使用自定义编码器返回
+        from fastapi import Response
+        response_content = [guide.model_dump() for guide in public_guides]
+        json_content = json.dumps(response_content, cls=DateTimeEncoder)
+        return Response(content=json_content, media_type="application/json")
 
     except HTTPException:
         raise
@@ -306,9 +361,31 @@ async def get_user_guides(
     offset: int = Query(0, description="偏移量")
 ):
     """
-    获取用户的攻略列表
+    获取用户的攻略列表（支持Redis缓存）
     """
     try:
+        # 尝试从 Redis 缓存读取
+        redis_client = await _get_redis_client()
+        cache_key = _make_cache_key(user_id, limit, offset, status.value if status else None)
+
+        if redis_client:
+            try:
+                cached_data = await redis_client.get(cache_key)
+                if cached_data:
+                    logger.info(f"缓存命中: {cache_key}")
+                    user_guides = json.loads(cached_data)
+                    # 缓存命中时直接返回，不需要再转换
+                    return JSONResponse(
+                        content=user_guides,
+                        headers={
+                            "Cache-Control": "public, max-age=300",
+                            "X-Cache": "HIT"
+                        }
+                    )
+            except Exception as e:
+                logger.warning(f"Redis缓存读取失败: {e}")
+
+        # 缓存未命中，从 MongoDB 查询
         collection = await _get_guides_collection()
         if collection is None:
             raise HTTPException(status_code=500, detail="数据库连接失败")
@@ -318,6 +395,7 @@ async def get_user_guides(
         if status:
             query["status"] = status.value
 
+        logger.info(f"MongoDB查询: {query}")
         # 查询用户的攻略
         cursor = collection.find(query).sort("created_at", -1).skip(offset).limit(limit)
         documents = await cursor.to_list(length=limit)
@@ -327,8 +405,33 @@ async def get_user_guides(
             doc["id"] = doc.get("id", str(doc.get("_id", "")))
             user_guides.append(GuideListItem(**doc))
 
-        return user_guides
+        # 将结果存入 Redis 缓存
+        if redis_client:
+            try:
+                # 转换为可序列化的格式 - Pydantic V2 使用 model_dump()
+                response_content = [guide.model_dump() for guide in user_guides]
+                cache_data = json.dumps(response_content, cls=DateTimeEncoder)
+                await redis_client.setex(cache_key, CACHE_TTL, cache_data)
+                logger.info(f"缓存已更新: {cache_key}, TTL: {CACHE_TTL}s")
+            except Exception as e:
+                logger.warning(f"Redis缓存写入失败: {e}")
 
+        # 返回结果 - 使用自定义编码器处理 datetime
+        from fastapi import Response
+        response_content = [guide.model_dump() for guide in user_guides]
+        # 手动序列化以使用自定义编码器
+        json_content = json.dumps(response_content, cls=DateTimeEncoder)
+        return Response(
+            content=json_content,
+            media_type="application/json",
+            headers={
+                "Cache-Control": "public, max-age=300",
+                "X-Cache": "MISS"
+            }
+        )
+
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"获取攻略列表失败: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -402,6 +505,11 @@ async def update_guide(request: UpdateGuideRequest):
             {"$set": update_data}
         )
 
+        # 清除用户缓存
+        user_id = existing.get("user_id")
+        if user_id:
+            await _invalidate_guides_cache(user_id)
+
         logger.info(f"攻略更新成功: {request.guide_id}")
 
         return {
@@ -437,6 +545,9 @@ async def delete_guide(guide_id: str, user_id: str = Query(..., description="用
 
         # 删除攻略
         await collection.delete_one({"id": guide_id})
+
+        # 清除用户缓存
+        await _invalidate_guides_cache(user_id)
 
         logger.info(f"攻略删除成功: {guide_id}")
 
